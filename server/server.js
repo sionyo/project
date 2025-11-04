@@ -12,6 +12,7 @@ app.use(express.json())
 
 //routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
 
 //basic routes
 app.use('/', (req,res) => {
