@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { adminLogin, clearAdminError } from '../../store/adminSlice'
+import { useCallback } from  'react'
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -22,12 +23,12 @@ const AdminLogin = () => {
     dispatch(clearAdminError())
   }, [admin, navigate, dispatch])
 
-  const onChange = (e) => {
+  const onChange = useCallback((e) => {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }))
-  }
+  })
 
   const onSubmit = (e) => {
     e.preventDefault()

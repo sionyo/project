@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { getAdminProfile, adminLogout } from '../../store/adminSlice'
+import { getAdminProfile, adminLogout, getUsers } from '../../store/adminSlice'
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { admin } = useSelector((state) => state.admin)
+  const { admin, userCount, users} = useSelector((state) => state.admin)
 
   useEffect(() => {
     if (!admin) {
@@ -14,6 +15,7 @@ const AdminDashboard = () => {
         navigate('/admin/login')
       })
     }
+    dispatch(getUsers())
   }, [admin, dispatch, navigate])
 
   const handleLogout = () => {
@@ -64,7 +66,7 @@ const AdminDashboard = () => {
               {/* Stats Cards */}
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
                 <h3 className="text-lg font-semibold text-blue-800 mb-2">Total Users</h3>
-                <p className="text-3xl font-bold text-blue-600">0</p>
+                <p className="text-3xl font-bold text-blue-600">{userCount}</p>
                 <p className="text-blue-600 text-sm mt-2">Manage users</p>
               </div>
 
@@ -85,7 +87,9 @@ const AdminDashboard = () => {
             <div className="mt-8">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
               <div className="flex space-x-4">
-                <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-200">
+                <button 
+                  onClick={() => navigate('/admin/users')}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-200">
                   View Users
                 </button>
                 <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition duration-200">

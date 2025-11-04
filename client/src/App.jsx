@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import UsersList from './pages/admin/UsersList'
 
 function App() {
   const dispatch = useDispatch()
@@ -56,6 +57,10 @@ function App() {
         <Route 
           path="/admin/dashboard" 
           element={admin ? <AdminDashboard /> : <Navigate to="/admin/login" />} 
+        />
+        <Route 
+          path="/admin/users" 
+          element={admin ? <UsersList /> : <Navigate to="/admin/login" />} 
         />
         
         {/* Fallback */}

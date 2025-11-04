@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { useRevalidator } from 'react-router-dom'
 
 const API = axios.create({
     baseURL: '/api',
@@ -12,6 +13,17 @@ API.interceptors.request.use((config) => {
     }
     return config
 })
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('adminToken')
+      window.location.href = '/admin/login'
+    }
+    return Promise.reject(error)
+  }
+)
 
 export const adminLogin = createAsyncThunk(
     'admin/login',
@@ -38,6 +50,30 @@ export const getAdminProfile = createAsyncThunk(
     }
 )
 
+export const getUsers = createAsyncThunk(
+  'admin/getUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await API.get('/admin/users')
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: 'Network error' })
+    }
+  }
+)
+
+export const deleteUser = createAsyncThunk(
+    'admin/deleteUser',
+    async(userId, {rejectWithValue}) => {
+        try {
+            await API.delete(`/admin/users/${userId}`)
+            return userId
+        } catch (error) {
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+
 
 const adminSlice = createSlice({
     name: 'admin',
@@ -47,6 +83,8 @@ const adminSlice = createSlice({
         isLoading: false,
         isError: false,
         message: '',
+        users:null,
+        userCount:0,
     },
     reducers : {
         adminLogout: (state) => {
@@ -76,6 +114,23 @@ const adminSlice = createSlice({
             })
             .addCase(getAdminProfile.fulfilled, (state,action) => {
                 state.admin = action.payload.admin
+            })
+            .addCase(getUsers.pending, (state,action) => {
+                state.isLoading = true
+            })
+            .addCase(getUsers.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.users = action.payload.users
+                state.userCount = action.payload.count
+            })
+            .addCase(getUsers.rejected, (state,action) => {
+                state.isLoading = false,
+                state.isError = true,
+                state.message = action.payload?.message || 'Error fetching user'
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.users = state.users.filter(user => user._id !== action.payload)
+                state.userCount = state.userCount - 1
             })
     }
 })
